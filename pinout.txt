@@ -1,0 +1,3 @@
+PIR is pin 12
+Redundant DHT11 is on pin 19
+
