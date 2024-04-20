@@ -1,65 +1,125 @@
-import paho.mqtt.client as mqtt
-import csv
-import os
-import datetime
-from pytz import timezone
+//MQTT Client based on PubSubClient by Nick O'Leary 
+//CCS811 Device Library by DFRobot_CCS881
+//Communications and Networking libraries by espressif and Arduino
 
-MQTT_SERVER = "localhost"
-MQTT_FIELDS = ["temperature", "humidity", "VOC", "CO2"]
-fields = MQTT_FIELDS.copy()
-fields.append("time")
-filename = "sensordata.csv"
-sensorqueue = []
-sensorqueuelist = {}
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
 
-for i in MQTT_FIELDS:
-    sensorqueuelist[i] = None
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <DHT11.h>
+#include "DFRobot_CCS811.h"
 
+DFRobot_CCS811 CCS811(&Wire, 0x5B);
 
-def new_row():
-    dicta = {}
-    for i in MQTT_FIELDS:
-        dicta[i] = ""
-    sensorqueue.append(dicta)
+#define SEALEVELPRESSURE_HPA (1013.25)
+#define TOKEN ""
+#define DEVICEID ""
 
+Adafruit_BME680 bme;
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
+const char* ssid = "mqttserver";
+const char* password = "";
+const char* mqtt_server = "192.168.100.199";
 
-    for i in range(len(MQTT_FIELDS)):
-        client.subscribe("esp32/" + MQTT_FIELDS[i])
+WiFiClient espClient;
+PubSubClient client(espClient);
+long last = 0;
+char msg[50];
+int value = 0;
 
+DHT11 dht11(12);
+int temperature = 0;
+int humidity = 0;
+float VOC = 0;
+float CO2 = 0;
 
-def on_message(client, userdata, msg):
-    print(msg.topic + " " + msg.payload.decode("ascii"))
-    sensorqueuelist[msg.topic.replace("esp32/", "")] = msg.payload.decode("ascii")
-    print("Sending Row: ")
-    dictionary = {}
-    for key in MQTT_FIELDS:
-        dictionary[key] = sensorqueuelist[key]
-    with open(filename, "a") as csvfile:
-        utc_now = datetime.datetime.now(datetime.UTC)
-        dictionary["time"] = utc_now.astimezone(timezone("US/Eastern")).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        writer = csv.DictWriter(csvfile, fieldnames=fields)
-        writer.writerow(dictionary)
-    csvfile.close()
-    print(str(dictionary))
+void setup() {
+  Serial.begin(115200);
+  
+  while (!Serial);
+  Serial.println(F("BME680 test"));
 
+  bme.begin();
 
-isExist = os.path.exists(filename)
+  while(CCS811.begin() != 0);
 
-if not isExist:
-    new_row()
-    with open(filename, "w") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fields)
-        writer.writeheader()
-    csvfile.close()
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(MQTT_SERVER, 1883, 60)
+  
 
-client.loop_forever()
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setPressureOversampling(BME680_OS_4X);
+  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+  bme.setGasHeater(320, 150); // 320*C for 150 ms
+}
+
+void setup_wifi() {
+  delay(10);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) 
+  Serial.println(WiFi.localIP());
+}
+
+void reconnect() {
+  while (!client.connected()) {
+      delay(5000);
+    }
+  }
+
+void loop() {
+
+  if (! bme.performReading()) {
+    Serial.println("Failed to perform reading :(");
+    return;
+  }
+  Serial.print("Temperature = ");
+  Serial.print(bme.temperature);
+  Serial.println(" *C");
+  char tempString[8];
+  dtostrf(bme.temperature, 1, 2, tempString);
+
+  client.publish("esp32/temperature", tempString);
+
+  Serial.print("Pressure = ");
+  Serial.print(bme.pressure / 100.0);
+  Serial.println(" hPa");
+
+  Serial.print("Humidity = ");
+  Serial.print(bme.humidity);
+  Serial.println(" %");
+  char humString[8];
+  dtostrf(bme.humidity, 1, 2, humString[8]);
+  client.publish("esp32/VOC", humString);
+
+  Serial.print("Gas = ");
+  Serial.print(bme.gas_resistance / 1000.0);
+  Serial.println(" KOhms");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.println(" m");
+
+  if((CCS811.checkDataReady() == true)){
+
+      VOC = CCS811.getTVOCPPB();
+      char VOCString[8];
+      dtostrf(VOC, 1, 2, VOCString);
+      Serial.print("VOC: ");
+      Serial.println(VOCString);
+      client.publish("esp32/VOC", VOCString);
+
+      CO2 = CCS811.getCO2PPM();
+      char CO2String[8];
+      dtostrf(CO2, 1, 2, CO2String);
+      Serial.print("CO2: ");
+      Serial.println(CO2String);
+      client.publish("esp32/CO2", CO2String);
+
+  Serial.println();
+  delay(2000);
+}
