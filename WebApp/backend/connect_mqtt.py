@@ -3,7 +3,7 @@ import datetime
 import threading
 from pytz import timezone
 
-MQTT_SERVER = "192.168.100.1"
+MQTT_SERVER = "192.168.100.199"
 MQTT_FIELDS = ["temperature", "humidity", "VOC", "CO2"]
 fields = MQTT_FIELDS.copy()
 fields.append("time")
