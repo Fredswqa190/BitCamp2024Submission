@@ -93,8 +93,8 @@ void loop() {
   Serial.print(bme.humidity);
   Serial.println(" %");
   char humString[8];
-  dtostrf(bme.humidity, 1, 2, humString[8]);
-  client.publish("esp32/VOC", humString);
+  dtostrf(bme.humidity, 1, 2, humString);
+  client.publish("esp32/humidity", humString);
 
   Serial.print("Gas = ");
   Serial.print(bme.gas_resistance / 1000.0);
@@ -122,4 +122,5 @@ void loop() {
 
   Serial.println();
   delay(2000);
+  }
 }
