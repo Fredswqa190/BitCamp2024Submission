@@ -58,20 +58,21 @@ void setup() {
 
 void setup_wifi() {
   delay(10);
-  do {
   WiFi.begin(ssid, password);
-  } while (WiFi.status() != WL_CONNECTED);
+  while (WiFi.status() != WL_CONNECTED);
   Serial.println(WiFi.localIP());
 }
 
 void reconnect() {
   while (!client.connected()) {
+      Serial.println("Connecting to mqtt");
+      client.connect("");
       delay(5000);
-    }
   }
+}
 
 void loop() {
-
+  reconnect();
   if (! bme.performReading()) {
     Serial.println("Failed to perform reading :(");
     return;
