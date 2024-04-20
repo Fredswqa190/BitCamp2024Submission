@@ -49,8 +49,6 @@ void setup() {
   setup_wifi();
   client.setServer(mqtt_server, 1883);
 
-  
-
   bme.setTemperatureOversampling(BME680_OS_8X);
   bme.setHumidityOversampling(BME680_OS_2X);
   bme.setPressureOversampling(BME680_OS_4X);
@@ -60,8 +58,9 @@ void setup() {
 
 void setup_wifi() {
   delay(10);
+  do {
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) 
+  } while (WiFi.status() != WL_CONNECTED);
   Serial.println(WiFi.localIP());
 }
 
