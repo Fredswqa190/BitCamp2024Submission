@@ -10,9 +10,9 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <DHT11.h>
-//#include "DFRobot_CCS811.h"
+#include "DFRobot_CCS811.h"
 
-//DFRobot_CCS811 CCS811(&Wire, 0x5B);
+DFRobot_CCS811 CCS811(&Wire, 0x5B);
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define TOKEN ""
@@ -22,7 +22,7 @@ Adafruit_BME680 bme;
 
 const char* ssid = "mqttserver";
 const char* password = "";
-const char* mqtt_server = "192.168.100.1";
+const char* mqtt_server = "192.168.100.199";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -43,6 +43,8 @@ void setup() {
   Serial.println(F("BME680 test"));
 
   bme.begin();
+
+  while(CCS811.begin() != 0);
 
   setup_wifi();
   client.setServer(mqtt_server, 1883);
@@ -90,6 +92,9 @@ void loop() {
   Serial.print("Humidity = ");
   Serial.print(bme.humidity);
   Serial.println(" %");
+  char humString[8];
+  dtostrf(bme.humidity, 1, 2, humString[8]);
+  client.publish("esp32/VOC", humString);
 
   Serial.print("Gas = ");
   Serial.print(bme.gas_resistance / 1000.0);
@@ -98,6 +103,22 @@ void loop() {
   Serial.print("Approx. Altitude = ");
   Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
   Serial.println(" m");
+
+  if((CCS811.checkDataReady() == true)){
+
+      VOC = CCS811.getTVOCPPB();
+      char VOCString[8];
+      dtostrf(VOC, 1, 2, VOCString);
+      Serial.print("VOC: ");
+      Serial.println(VOCString);
+      client.publish("esp32/VOC", VOCString);
+
+      CO2 = CCS811.getCO2PPM();
+      char CO2String[8];
+      dtostrf(CO2, 1, 2, CO2String);
+      Serial.print("CO2: ");
+      Serial.println(CO2String);
+      client.publish("esp32/CO2", CO2String);
 
   Serial.println();
   delay(2000);
