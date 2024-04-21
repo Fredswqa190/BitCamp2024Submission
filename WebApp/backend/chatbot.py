@@ -4,9 +4,11 @@ import openai
 
 app = Flask(__name__)
 CORS(app, resources={r"/chat": {"origins": "http://localhost:4001"}})
+with open("apiKey.txt", "r") as f:
+    api_key = f.read().strip()
 
 # Replace 'your-openai-api-key' with your actual OpenAI API key
-client = openai.OpenAI(api_key = "sk-proj-CnQr7deTzUtoKljAFQlAT3BlbkFJKdbEFJ74NNUPVxxGHXlC")
+client = openai.OpenAI(api_key = api_key)
 
 @app.route('/chat', methods=['POST'])
 def chat():
