@@ -6,7 +6,8 @@ import LiveChart from './components/LiveChart';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import SensorStatus from './components/SensorStatus';
-import { Grid } from '@mui/material';
+import { Container, Grid } from '@mui/material';
+import Chatbot from './components/chat';
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -49,12 +50,15 @@ export default function App() {
             <ToggleColorMode/>
             {/* <Counter/> */}
             <SensorStatus />
+            <Container maxwidth="xl">
             <Grid marginTop="2em" container columns={4}>
               <LiveChart title="Temperature" dataKey="temperature"/>
               <LiveChart title="CO2" dataKey="co2"/>
               <LiveChart title="Humidity" dataKey="humidity"/>
               <LiveChart title="Volatile Organic Compounds" dataKey="voc"/>
             </Grid>
+            <Chatbot/>
+            </Container>
           </Box>
         </ThemeProvider>
       </ColorModeContext.Provider>
