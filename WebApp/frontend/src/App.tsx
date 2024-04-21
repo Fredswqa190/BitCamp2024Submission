@@ -50,15 +50,22 @@ export default function App() {
             <ToggleColorMode/>
             {/* <Counter/> */}
             <SensorStatus />
-            <Container maxwidth="xl">
-            <Grid marginTop="2em" container columns={4}>
+            <Grid
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            >
+            <h1>LivePresence</h1>
+          </Grid>
+            <Grid marginTop="2em" container columns={4} direction="row">
               <LiveChart title="Temperature" dataKey="temperature"/>
               <LiveChart title="CO2" dataKey="co2"/>
               <LiveChart title="Humidity" dataKey="humidity"/>
               <LiveChart title="Volatile Organic Compounds" dataKey="voc"/>
-            </Grid>
-            <Chatbot/>
-            </Container>
+              <Chatbot/>
+            </Grid>            
           </Box>
         </ThemeProvider>
       </ColorModeContext.Provider>

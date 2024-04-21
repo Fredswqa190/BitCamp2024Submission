@@ -25,7 +25,7 @@ const Chatbot: React.FC = () => {
 
     return (
         <div>
-            <h1>Chat with Our Bot</h1>
+            <h1>Chat with PresenceGuard</h1>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
