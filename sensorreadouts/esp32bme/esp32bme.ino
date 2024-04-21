@@ -10,7 +10,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <DHT11.h>
-#include "DFRobot_CCS811.h"
+#include <DFRobot_CCS811.h>
 
 DFRobot_CCS811 CCS811(&Wire, 0x5B);
 

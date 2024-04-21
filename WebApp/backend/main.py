@@ -12,7 +12,7 @@ app.config['SECRET_KEY'] = 'secret!'
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-occupancy_model = tf.keras.models.load_model(r'C:\Users\yhan8\OneDrive\Documents\GitHub\EcoSense-HooHacksSubmission\temperature_model.keras')
+occupancy_model = tf.keras.models.load_model(r'C:\Users\yhan8\OneDrive\Documents\BitCamp\training\occupancy-detection-uci-data\CODE_FILES\temperature_model.keras')
 OCCUPANCY_THRESHOLD = 0.5
 
 start = time.time()
@@ -22,14 +22,14 @@ temp_axis_values = [0.0] * 6
 def rand_float():
     return round(100 * abs(np.random.normal()), 3)
 
-def generate_sample_data():
+"""def generate_sample_data():
     return {
         "temperature": rand_float(),
         "co2": rand_float(),
         "humidity": rand_float(),
         "voc": rand_float(),
         "occupancy": 1
-    }
+    }"""
 
 # def update_data():
 #     threading.Timer(2, update_data).start()
@@ -50,7 +50,8 @@ def handle_sensor_data(data):
         "temperature": data["temperature"],
         "co2": data["CO2"],
         "humidity": data["humidity"],
-        "voc": data["VOC"]
+        "voc": data["VOC"],
+        "pir": data["PIR"]
     })
 
     stdnorm = StandardScaler()
@@ -63,7 +64,6 @@ def handle_sensor_data(data):
     occupancy = True if res > OCCUPANCY_THRESHOLD else False
     print(data_arr)
     print(data, res)
-    
     socketio.emit("occupancy", occupancy)
 
 try:
@@ -74,4 +74,3 @@ except Exception as e:
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=4003)
-

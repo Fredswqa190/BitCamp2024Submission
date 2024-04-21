@@ -14,6 +14,7 @@ export default function SensorStatus() {
     const [co2, setCO2] = useState(0);
     const [humidity, setHumidity] = useState(0);
     const [voc, setVOC] = useState(0);
+    const [pir, setpir] = useState(false);
 
     useEffect(() => {
         socket.on("connect", () => {
@@ -27,6 +28,7 @@ export default function SensorStatus() {
             setCO2(data.co2);
             setHumidity(data.humidity);
             setVOC(data.humidity);
+            setpir(data.pir);
         });
 
         socket.on("occupancy", (data) => {
@@ -47,9 +49,10 @@ export default function SensorStatus() {
         <Box gap={4} p={2} display="flex" flexWrap={"wrap"}>
             <StatusLabel label="Sensor Status" value={connectionStatus ? "Connected" : "Disconnected" } valueColor={connectionStatus ? GREEN : RED}/>
             <StatusLabel label="Occupancy" value={occupancy ? "Occupants detected" : "No occupants detected"} valueColor={occupancy ? GREEN : RED}/>
-            <StatusLabel label="Temperature" units="K" value={temp} valueColor={YELLOW}/>
+            <StatusLabel label="Temperature" units="C" value={temp} valueColor={YELLOW}/>
             <StatusLabel label="CO2" units="PPM" value={co2} valueColor={YELLOW}/>
             <StatusLabel label="Humidity" units="g/kg" value={humidity} valueColor={YELLOW}/>
+            <StatusLabel label="Motion Detected" value={pir ? "Motion Detected" : "No motion detected"} valueColor={pir ? GREEN : RED}/>
         </Box>
     )
 }
