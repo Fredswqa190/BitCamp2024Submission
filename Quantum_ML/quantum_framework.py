@@ -32,7 +32,7 @@ class QuantumCircuit:
         binds = [{self.thetas[i]: [thetas[i]] for i in range(len(thetas))}]
         job = self.backend.run(self.circuit, shots=self.shots, parameter_binds=binds)
 
-        result = job.result().get_counts(self.circuit)
+        result = job.result().get_counts()
 
         counts = torch.zeros(self.n_qubits)
         for i in range(self.n_qubits):
