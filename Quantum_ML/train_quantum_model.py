@@ -15,7 +15,7 @@ from quantum_framework import QuantumHybridModel
 
 starttime = time.time()
 NUM_EPOCHS = 100
-BATCH_SIZE = 8192
+BATCH_SIZE = 128
 CHECKPOINT_DIR = f"data/checkpoints/{int(starttime)}_quantum/"
 LOG_DIR = f"data/logs/{int(starttime)}_quantum"
 NUM_WORKERS = 16

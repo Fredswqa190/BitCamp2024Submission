@@ -91,22 +91,32 @@ class QuantumHybridModel(nn.Module):
         super().__init__()
 
         self.backend = AerSimulator(method="density_matrix", device="CPU")
-        self.fc1 = nn.Linear(3, 512)
-        self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, 64)
-        self.fc4 = nn.Linear(64, 2)
+        self.fcs = nn.Sequential(
+            nn.Linear(3, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 2),
+        )
         self.softmax = nn.Softmax(dim=-1)
         self.relu = nn.ReLU()
         self.quantum = QuantumLayer(qubits, self.backend, shots, shift)
 
     def forward(self, x):
-        x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        x = self.relu(self.fc3(x))
-        x = self.relu(self.fc4(x))
 
+        x = self.fcs(x)
         x = self.quantum(x)
 
-        self.softmax(x)
+        x = self.softmax(x)
 
         return x
