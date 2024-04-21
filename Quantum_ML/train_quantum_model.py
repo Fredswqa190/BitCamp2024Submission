@@ -134,7 +134,7 @@ for epoch in range(NUM_EPOCHS):
     writer.add_scalars("Accuracy", accuracy_data, epoch + 1)
     writer.flush()
 
-    checkpoint_path = os.path.join(CHECKPOINT_DIR, "checkpoint-{epoch:03d}.pth")
+    checkpoint_path = os.path.join(CHECKPOINT_DIR, f"checkpoint-{epoch:03d}.pth")
 
     torch.save(model.state_dict(), checkpoint_path)
     print(f"Checkpoint saved to {checkpoint_path}\n")
