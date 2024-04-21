@@ -35,6 +35,15 @@ int temperature = 0;
 int humidity = 0;
 float VOC = 0;
 float CO2 = 0;
+char tempString[8];
+char humString[8];
+char VOCString[8];
+char CO2String[8];
+char PIRString[8];
+
+const int pir_pin = 4;
+const int echo_pin = 26;
+const int trig_pin = 27;
 
 void setup() {
   Serial.begin(115200);
@@ -54,6 +63,8 @@ void setup() {
   bme.setPressureOversampling(BME680_OS_4X);
   bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
   bme.setGasHeater(320, 150); // 320*C for 150 ms
+
+  pinMode(pir_pin, INPUT);
 }
 
 void setup_wifi() {
@@ -64,15 +75,19 @@ void setup_wifi() {
 }
 
 void reconnect() {
+  Serial.print("Connecting to mqtt ");
   while (!client.connected()) {
-      Serial.println("Connecting to mqtt");
       client.connect("");
-      delay(5000);
+      Serial.print(".");
+      delay(500);
   }
+  Serial.println(" Connected!");
 }
 
 void loop() {
-  reconnect();
+  if (!client.connected()) {
+    reconnect();
+  }
   if (! bme.performReading()) {
     Serial.println("Failed to perform reading :(");
     return;
@@ -80,7 +95,6 @@ void loop() {
   Serial.print("Temperature = ");
   Serial.print(bme.temperature);
   Serial.println(" *C");
-  char tempString[8];
   dtostrf(bme.temperature, 1, 2, tempString);
 
   client.publish("esp32/temperature", tempString);
@@ -92,7 +106,6 @@ void loop() {
   Serial.print("Humidity = ");
   Serial.print(bme.humidity);
   Serial.println(" %");
-  char humString[8];
   dtostrf(bme.humidity, 1, 2, humString);
   client.publish("esp32/humidity", humString);
 
@@ -104,23 +117,31 @@ void loop() {
   Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
   Serial.println(" m");
 
+  Serial.print("PIR: ");
+  if (digitalRead(pir_pin)) {
+    Serial.println("Motion detected");
+    strcpy(PIRString, "True");
+  } else {
+    Serial.println("No motion");
+    strcpy(PIRString, "False");
+  }
+  client.publish("esp32/PIR", PIRString);
+
   if((CCS811.checkDataReady() == true)){
 
       VOC = CCS811.getTVOCPPB();
-      char VOCString[8];
       dtostrf(VOC, 1, 2, VOCString);
       Serial.print("VOC: ");
       Serial.println(VOCString);
       client.publish("esp32/VOC", VOCString);
 
       CO2 = CCS811.getCO2PPM();
-      char CO2String[8];
       dtostrf(CO2, 1, 2, CO2String);
       Serial.print("CO2: ");
       Serial.println(CO2String);
       client.publish("esp32/CO2", CO2String);
 
-  Serial.println();
-  delay(2000);
+      Serial.println();
   }
+  delay(500);
 }
