@@ -39,33 +39,29 @@ export default function App() {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline enableColorScheme />
-          <Box 
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              minHeight: "100%",
-              minWidth: "100%",
-            }}
-          >
+          <Box sx={{display: 'flex', flexDirection: 'column', minHeight: "100vh", minWidth: "100%",}}>
             <ToggleColorMode/>
             {/* <Counter/> */}
             <SensorStatus />
-            <Grid
-            container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            >
-            <h1>LivePresence</h1>
-          </Grid>
-            <Grid marginTop="2em" container columns={4} direction="row">
-              <LiveChart title="Temperature" dataKey="temperature"/>
-              <LiveChart title="CO2" dataKey="co2"/>
-              <LiveChart title="Humidity" dataKey="humidity"/>
-              <LiveChart title="Volatile Organic Compounds" dataKey="voc"/>
+            <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
+              <h1>LivePresence</h1>
+            </Grid>
+            <Grid container justifyContent="right" alignItems="center" sx={{ flex: 1 }}>
               <Chatbot/>
-            </Grid>            
+            </Grid>
+            <Box sx={{ height: 'auto', width: '70%', overflow: 'auto' }}>
+              <Grid container justifyContent="left" alignItems="center">
+                <Grid marginTop="2em" container columns={2} direction="row" > 
+                  <LiveChart title="Temperature" dataKey="temperature"/>
+                  <LiveChart title="CO2" dataKey="co2"/>
+                </Grid >
+                <Grid marginTop="2em" container columns={2} direction="row" >
+                  <LiveChart title="Humidity" dataKey="humidity"/>
+                  <LiveChart title="Volatile Organic Compounds" dataKey="voc"/>
+                </Grid >
+              </Grid>
+            </Box>
+            
           </Box>
         </ThemeProvider>
       </ColorModeContext.Provider>
