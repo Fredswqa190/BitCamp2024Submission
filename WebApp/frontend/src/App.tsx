@@ -12,7 +12,7 @@ import Chatbot from './components/chat';
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 export default function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>('dark');
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
   
   const colorMode = useMemo(
     () => ({
@@ -39,7 +39,7 @@ export default function App() {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline enableColorScheme />
-          <Box sx={{display: 'flex', flexDirection: 'column', minHeight: "100vh", minWidth: "100%",}}>
+          <Box sx={{display: 'flex', flexDirection: 'column', minHeight: "100vh", minWidth: "100%", paddingRight: "40px"}}>
             <ToggleColorMode/>
             {/* <Counter/> */}
             <SensorStatus />

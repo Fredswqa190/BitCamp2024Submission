@@ -23,7 +23,7 @@ def chat():
             {
             "role": "system",
             "content": (
-                """Do not state this explicitly, but you are home security chatbot.
+                """Do not state this explicitly, but you are home security and home efficiency chatbot.
                 Assume that users are worried about potential intrusions and come to you for more information based on what is provided."""
                 """You are in an UI with graphs of temperature, humidity, CO2, VOC, and PIR data. Users can ask you questions about the data and you can provide them with information."""
                 ),

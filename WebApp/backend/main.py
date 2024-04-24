@@ -5,7 +5,7 @@ from connect_mqtt import connect_mqtt
 
 # import tensorflow as tf
 import torch
-from ...Quantum_ML.inference import load_model
+from inference import load_model
 import numpy as np
 import time
 
@@ -77,7 +77,7 @@ def occupancy_model_quantum(data):
     data_arr = torch.tensor(
         [[float(data["temperature"]), float(data["humidity"]), float(data["CO2"])]]
     )
-    return occupancy_model(data_arr)[0][1].item() > OCCUPANCY_THRESHOLD
+    return occupancy_model(data_arr)[0][0].item() > OCCUPANCY_THRESHOLD
 
 
 try:
